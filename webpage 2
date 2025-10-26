@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Club de Fermentos Uniandes</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #00ffcc;
+      font-family: "Press Start 2P", monospace;
+      text-align: center;
+      padding-top: 100px;
+      overflow: hidden;
+    }
+
+    h1 {
+      font-size: 28px;
+      text-shadow: 2px 2px 10px #ff00ff;
+      animation: glow 1.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from { text-shadow: 0 0 5px #ff00ff; }
+      to { text-shadow: 0 0 20px #00ffff; }
+    }
+
+    .button {
+      display: inline-block;
+      background: #ff00cc;
+      color: #fff;
+      padding: 15px 25px;
+      margin: 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 16px;
+      box-shadow: 0 0 10px #ff00ff;
+      transition: 0.2s;
+    }
+
+    .button:hover {
+      background: #00ffff;
+      box-shadow: 0 0 20px #00ffff;
+    }
+
+    #pacman {
+      width: 80px;
+      height: 80px;
+      background: yellow;
+      border-radius: 50%;
+      position: relative;
+      margin: 50px auto;
+      animation: eat 0.4s infinite alternate;
+      clip-path: polygon(0% 0%, 100% 25%, 100% 75%, 0% 100%);
+      cursor: pointer;
+    }
+
+    @keyframes eat {
+      from { clip-path: polygon(0% 0%, 100% 25%, 100% 75%, 0% 100%); }
+      to { clip-path: polygon(0% 0%, 100% 50%, 0% 100%); }
+    }
+
+    .moving-text {
+      font-size: 14px;
+      color: #ffcc00;
+      position: absolute;
+      bottom: 10px;
+      width: 100%;
+      animation: move 6s linear infinite;
+    }
+
+    @keyframes move {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    .spark {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: #ff0;
+      border-radius: 50%;
+      animation: sparkle 1.5s infinite ease-in-out;
+    }
+
+    @keyframes sparkle {
+      0%, 100% { opacity: 0; transform: scale(0.5); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>✨ CLUB DE FERMENTOS UNIANDES ✨</h1>
+  <h2 style="color:#ff66ff;">¡Dale click al Pacman para comida gratis! 🍒</h2>
+
+  <div id="pacman" onclick="showMessage()"></div>
+
+  <div id="message" style="display:none;">
+    <p>¿Quieres comida gratis? 🍹<br>
+    ¡Asiste a nuestra primera sesión!</p>
+    <a class="button" href="https://chat.whatsapp.com/F5aFuXaILuC3MxsDW4c0Qi?mode=wwt" target="_blank">👉 Unirme al grupo</a>
+  </div>
+
+  <a class="button" href="deshonor.html">😤 No me gusta fermentar</a>
+
+  <div class="moving-text">👾 Club de Fermentos Uniandes 👾 Kombucha Gratis 👾 Fermenta tu destino 👾</div>
+
+  <script>
+    function showMessage() {
+      document.getElementById("message").style.display = "block";
+    }
+
+    // chispitas vintage
+    for (let i = 0; i < 25; i++) {
+      const spark = document.createElement("div");
+      spark.className = "spark";
+      spark.style.left = Math.random() * 100 + "%";
+      spark.style.top = Math.random() * 100 + "%";
+      spark.style.animationDelay = Math.random() * 2 + "s";
+      document.body.appendChild(spark);
+    }
+  </script>
+</body>
+</html>
