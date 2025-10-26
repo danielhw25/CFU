@@ -5,454 +5,258 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover" />
 <title>CFU Arcade - Club de Fermentos Uniandes</title>
 <style>
-/* === Fonts & base === */
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 :root{
-  --neon-a: #00ffee;
-  --neon-b: #ff00ff;
-  --accent: #00ffff;
-  --bg1: #0a0015;
-  --bg2: #18003a;
+  --neon-a:#00ffee;--neon-b:#ff00ff;--accent:#00ffff;
+  --bg1:#0a0015;--bg2:#18003a;
 }
 
-/* === Body / CRT base === */
-html,body{height:100%;margin:0;}
+/* Base */
+html,body{height:100%;margin:0}
 body{
-  margin:0;
-  padding:0;
-  background: radial-gradient(circle at center, var(--bg1) 0%, var(--bg2) 80%);
+  background:radial-gradient(circle at center,var(--bg1) 0%,var(--bg2) 80%);
   overflow:hidden;
   font-family:'Press Start 2P',monospace;
   color:var(--neon-a);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
   text-align:center;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-  cursor: url('https://cur.cursors-4u.net/games/gam-1/gam51.cur'), auto;
+  cursor:url('https://cur.cursors-4u.net/games/gam-1/gam51.cur'),auto;
   animation:pulse 6s infinite alternate;
 }
 @keyframes pulse{
-  0%{background: radial-gradient(circle at center, #0a0015 0%, #18003a 80%);}
-  100%{background: radial-gradient(circle at center, #0a0015 0%, #29005a 80%);}
+  0%{background:radial-gradient(circle at center,#0a0015 0%,#18003a 80%)}
+  100%{background:radial-gradient(circle at center,#0a0015 0%,#29005a 80%)}
 }
-/* thin scanlines CRT */
 body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  background:repeating-linear-gradient(
-    to bottom,
-    rgba(255,255,255,0.04) 0px,
-    rgba(255,255,255,0.02) 1px,
-    transparent 3px
-  );
+  content:"";position:fixed;inset:0;
+  background:repeating-linear-gradient(to bottom,rgba(255,255,255,.05)0,rgba(255,255,255,.02)2px,transparent 4px);
   pointer-events:none;
   mix-blend-mode:overlay;
 }
 
-/* === floating bubbles/stars === */
-.bubble,.star{position:fixed;border-radius:50%;opacity:0.85;pointer-events:none}
-.bubble{width:12px;height:12px;background:rgba(0,255,255,0.55);filter:blur(1px)}
-.star{width:6px;height:6px;background:var(--neon-b);box-shadow:0 0 8px var(--neon-b)}
-@keyframes floatY{from{transform:translateY(100vh) translateX(0);opacity:1}to{transform:translateY(-10vh) translateX(30px);opacity:0}}
+/* bubbles */
+.bubble,.star{position:fixed;border-radius:50%;opacity:.8;pointer-events:none;animation:floatY 10s linear infinite}
+.bubble{width:12px;height:12px;background:rgba(0,255,255,.6);filter:blur(1px)}
+.star{width:6px;height:6px;background:var(--neon-b);box-shadow:0 0 10px var(--neon-b);animation-duration:6s}
+@keyframes floatY{from{transform:translateY(100vh)}to{transform:translateY(-10vh)}}
 
-/* === logo/title === */
-#logo{width:70px;height:70px;background:url('https://upload.wikimedia.org/wikipedia/commons/3/33/Glass_jar_icon.svg') center/contain no-repeat; filter:drop-shadow(0 0 12px var(--accent)); margin-bottom:12px; animation:logoBounce 3s infinite}
+/* logo/title */
+#logo{width:70px;height:70px;background:url('https://upload.wikimedia.org/wikipedia/commons/3/33/Glass_jar_icon.svg')center/contain no-repeat;
+filter:drop-shadow(0 0 12px var(--accent));margin-bottom:12px;animation:logoBounce 3s infinite}
 @keyframes logoBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-h1{font-size:14px;margin:0 0 18px 0; color:var(--accent); text-shadow:0 0 10px var(--accent),0 0 20px var(--neon-b)}
+h1{font-size:14px;margin:0 0 18px 0;color:var(--accent);text-shadow:0 0 10px var(--accent),0 0 20px var(--neon-b)}
 
-/* === Buttons (main) === */
+/* buttons */
 .button{
-  display:inline-block;
-  text-decoration:none;
+  display:inline-block;text-decoration:none;
   background:linear-gradient(45deg,var(--neon-b),var(--accent));
-  color:#000;
-  padding:16px 30px;
-  border-radius:10px;
-  margin:8px;
-  box-shadow:0 0 16px var(--accent);
-  font-size:12px;
+  color:#000;padding:16px 30px;border-radius:10px;margin:8px;
+  box-shadow:0 0 16px var(--accent);font-size:12px;
   transition:transform .14s,box-shadow .14s;
-  -webkit-tap-highlight-color: transparent;
 }
-.button:active{transform:scale(.98)}
 .button:hover{transform:scale(1.05);box-shadow:0 0 30px var(--neon-b)}
 
-/* === Pac-Man area === */
-#pacman-container{display:none;flex-direction:column;align-items:center;margin-top:18px; width:100%; max-width:360px}
+/* pacman */
+#pacman-container{display:none;flex-direction:column;align-items:center;margin-top:18px;width:100%;max-width:360px}
 #animation{
-  position:relative;
-  width:320px;
-  height:120px;
+  position:relative;width:320px;height:120px;
   background:repeating-linear-gradient(to right,#111 0,#111 15px,#0a0a1a 15px,#0a0a1a 30px);
-  border:3px solid var(--accent);
-  border-radius:12px;
-  box-shadow:0 0 20px var(--accent);
-  overflow:hidden;
+  border:3px solid var(--accent);border-radius:12px;box-shadow:0 0 20px var(--accent);overflow:hidden
 }
-.pacman{
-  position:absolute;
-  top:30px;
-  width:64px; height:64px;
-  background:#ffff00;
-  border-radius:50%;
-  clip-path:polygon(50% 50%,100% 0%,100% 100%);
-  animation:chomp .36s infinite alternate, movePacman 5s linear infinite;
-  filter:drop-shadow(0 0 16px #ffff66);
-  cursor:pointer;
-  /* make clickable area a bit larger on mobile by keeping element slightly bigger */
-}
+.pacman{position:absolute;top:30px;width:64px;height:64px;background:#ffff00;border-radius:50%;
+clip-path:polygon(50% 50%,100% 0%,100% 100%);
+animation:chomp .36s infinite alternate,movePacman 5s linear infinite;
+filter:drop-shadow(0 0 16px #ffff66);cursor:pointer}
 @keyframes chomp{0%{clip-path:polygon(50% 50%,100% 10%,100% 90%)}100%{clip-path:polygon(50% 50%,100% 0%,100% 100%)}}
 @keyframes movePacman{0%{left:-70px}45%{left:260px}50%{transform:rotateY(180deg)}95%{left:-70px}100%{left:-70px}}
-.cherry{position:absolute;top:42px;left:248px;width:18px;height:18px;background:#ff2b2b;border-radius:50%;box-shadow:inset -3px -3px 5px rgba(0,0,0,0.25),0 0 12px #ff0044}
+.cherry{position:absolute;top:42px;left:248px;width:18px;height:18px;background:#ff2b2b;border-radius:50%;
+box-shadow:inset -3px -3px 5px rgba(0,0,0,.25),0 0 12px #ff0044}
 #bonus{position:absolute;top:8px;left:140px;color:#ffcc00;font-size:10px;opacity:0}
 #pacman-message{color:#ffcc00;text-shadow:0 0 12px var(--neon-b);font-size:16px;margin-top:14px;max-width:90%;line-height:1.3}
 
-/* small game over text appended over animation */
-@keyframes blink {0%,50%,100%{opacity:1}25%,75%{opacity:.3}}
-
-/* === Poll (voting) === */
+/* poll */
 #poll{display:none;margin-top:16px;flex-direction:column;align-items:center}
-.poll-btn{display:inline-block;margin:6px;background:linear-gradient(45deg,var(--neon-b),var(--accent));color:#000;padding:12px 20px;border-radius:10px;box-shadow:0 0 16px var(--accent);font-size:12px}
+.poll-btn{margin:6px;background:linear-gradient(45deg,var(--neon-b),var(--accent));
+color:#000;padding:12px 20px;border-radius:10px;box-shadow:0 0 16px var(--accent);font-size:12px}
 .poll-msg{margin-top:12px;color:#ffcc00;font-size:12px;text-shadow:0 0 8px var(--neon-b)}
 
-/* === Hologram pop-ups (neon translucent) === */
+/* holo */
 .holo{
-  position:fixed;
-  min-width:190px;
-  max-width:260px;
-  padding:10px 12px;
-  background:rgba(0,255,255,0.06);
-  border:1px solid rgba(0,255,255,0.45);
-  border-radius:8px;
-  color:var(--accent);
+  position:fixed;min-width:190px;max-width:260px;padding:10px 12px;
+  background:rgba(0,255,255,.06);border:1px solid rgba(0,255,255,.45);
+  border-radius:8px;color:var(--accent);
   text-shadow:0 0 12px var(--accent),0 0 6px var(--neon-b);
-  box-shadow:0 0 18px rgba(0,255,255,0.35);
-  font-size:11px;
-  opacity:0;
-  pointer-events:none;
-  animation:holoIn 6s linear forwards;
+  box-shadow:0 0 18px rgba(0,255,255,.35);
+  font-size:11px;opacity:0;pointer-events:none;animation:holoIn 6s linear forwards
 }
-@keyframes holoIn{0%{opacity:0;transform:translateY(18px) scale(.96)}10%{opacity:1;transform:translateY(0) scale(1)}80%{opacity:1}100%{opacity:0;transform:translateY(-18px) scale(.98)}}
+@keyframes holoIn{0%{opacity:0;transform:translateY(18px)scale(.96)}10%{opacity:1;transform:translateY(0)scale(1)}80%{opacity:1}100%{opacity:0;transform:translateY(-18px)scale(.98)}}
 
-/* === Footer marquee === */
-footer{position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,0.28);color:var(--neon-a);font-size:10px;padding:6px 0;border-top:1px solid var(--accent);text-shadow:0 0 8px var(--accent)}
+/* footer */
+footer{position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,.28);
+color:var(--neon-a);font-size:10px;padding:6px 0;border-top:1px solid var(--accent);text-shadow:0 0 8px var(--accent)}
 footer span{display:inline-block;white-space:nowrap;animation:marq 20s linear infinite}
 @keyframes marq{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
 
-/* === Responsive: mobile vertical adjustments === */
-@media (max-width:600px){
+/* responsive */
+@media(max-width:600px){
   h1{font-size:12px;margin-bottom:12px}
   #logo{width:56px;height:56px;margin-bottom:8px}
-  .button{padding:14px 20px;font-size:11px;margin:6px;border-radius:8px}
-  #animation{width:88vw; height:110px}
+  .button{padding:14px 20px;font-size:11px;margin:6px}
+  #animation{width:88vw;height:110px}
   .pacman{width:54px;height:54px;top:28px}
-  .cherry{left: calc(78vw);}
   #pacman-message{font-size:13px;margin-top:12px}
-  #poll{margin-top:10px}
-  .holo{min-width:170px;max-width:210px;font-size:10px}
   footer{font-size:9px}
-  /* ensure entire UI fits vertically on phones: reduce top/bottom spacing */
-  body{justify-content:flex-start;padding-top:10px;padding-bottom:36px}
-  #pacman-container{margin-top:8px}
 }
-
-/* prevent text selection on mobile */
-*{ -webkit-user-select:none; -ms-user-select:none; user-select:none; }
+@keyframes blink{0%,50%,100%{opacity:1}25%,75%{opacity:.3}}
+*{-webkit-user-select:none;user-select:none}
 </style>
 </head>
 <body>
 
-  <div id="logo" aria-hidden="true"></div>
-  <h1>🍶 CLUB DE FERMENTOS UNIANDES 🍶</h1>
+<div id="logo"></div>
+<h1>🍶 CLUB DE FERMENTOS UNIANDES 🍶</h1>
 
-  <a href="https://chat.whatsapp.com/F5aFuXaILuC3MxsDW4c0Qi?mode=wwt" target="_blank" class="button" id="join-btn">QUIERO UNIRME</a>
-  <a href="#" id="comida-btn" class="button">QUIERO COMIDA GRATIS 🍒</a>
-  <a href="#" id="no-fermentar" class="button">😤 NO ME GUSTA FERMENTAR</a>
+<a href="https://chat.whatsapp.com/F5aFuXaILuC3MxsDW4c0Qi?mode=wwt" target="_blank" class="button" id="join-btn">QUIERO UNIRME</a>
+<a href="#" id="comida-btn" class="button">QUIERO COMIDA GRATIS 🍒</a>
+<a href="#" id="no-fermentar" class="button">😤 NO ME GUSTA FERMENTAR</a>
 
-  <div id="pacman-container" aria-live="polite">
-    <div id="animation" role="img" aria-label="Pac-man animation">
-      <div class="pacman" id="pacman" title="Pac-Man"></div>
-      <div class="cherry" aria-hidden="true"></div>
-      <div id="bonus">+100 pts 🍒</div>
-    </div>
-    <div id="pacman-message">🎮 DALE CLICK AL PAC-MAN PARA OBTENER COMIDA GRATIS 🍒</div>
-
-    <div id="poll" aria-hidden="true">
-      <h2 style="font-size:12px; margin-bottom:14px;">🧫 VOTA POR TU FERMENTO FAVORITO 🧫</h2>
-      <div>
-        <button class="poll-btn" data-name="Kimchi">🥬 Kimchi</button>
-        <button class="poll-btn" data-name="Masa madre">🍞 Masa madre</button>
-        <button class="poll-btn" data-name="Kombucha">🍶 Kombucha</button>
-        <button class="poll-btn" data-name="Kéfir">🥛 Kéfir</button>
-      </div>
-      <div id="poll-msg" class="poll-msg" aria-live="polite"></div>
-    </div>
+<div id="pacman-container">
+  <div id="animation">
+    <div class="pacman" id="pacman"></div>
+    <div class="cherry"></div>
+    <div id="bonus">+100 pts 🍒</div>
   </div>
+  <div id="pacman-message">🎮 DALE CLICK AL PAC-MAN PARA OBTENER COMIDA GRATIS 🍒</div>
 
-  <footer><span>💾 Bienvenido al Club de Fermentos Uniandes - CFU © 2000-2025 💾 | ✨ Síguenos @cfuniandes ✨</span></footer>
+  <div id="poll">
+    <h2 style="font-size:12px;margin-bottom:14px;">🧫 VOTA POR TU FERMENTO FAVORITO 🧫</h2>
+    <div>
+      <button class="poll-btn" data-name="Kimchi">🥬 Kimchi</button>
+      <button class="poll-btn" data-name="Masa madre">🍞 Masa madre</button>
+      <button class="poll-btn" data-name="Kombucha">🍶 Kombucha</button>
+      <button class="poll-btn" data-name="Kéfir">🥛 Kéfir</button>
+    </div>
+    <div id="poll-msg" class="poll-msg"></div>
+  </div>
+</div>
 
-  <!-- audio assets (small, public domain / pixabay short effects) -->
-  <!-- background music (loop) and effects: all start only after first user touch -->
-  <audio id="bgm" loop preload="auto" src="https://cdn.pixabay.com/download/audio/2021/10/13/audio_2b7b2b16f9.mp3?filename=8-bit-background-loop-119.mp3"></audio>
-  <audio id="clickS" preload="auto" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_bf11a7b6ef.mp3?filename=retro-click-2-89698.mp3"></audio>
-  <audio id="waka" preload="auto" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_749b00288e.mp3?filename=pacman-waka-waka-112.wav"></audio>
-  <audio id="bonusS" preload="auto" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_5f6a8a8e5f.mp3?filename=powerup-1-6222.mp3"></audio>
+<footer><span>💾 Bienvenido al Club de Fermentos Uniandes - CFU © 2000-2025 💾 | ✨ Síguenos @cfuniandes ✨</span></footer>
+
+<audio id="bgm" loop preload="auto" src="https://cdn.pixabay.com/download/audio/2021/10/13/audio_2b7b2b16f9.mp3?filename=8-bit-background-loop-119.mp3"></audio>
+<audio id="clickS" preload="auto" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_bf11a7b6ef.mp3?filename=retro-click-2-89698.mp3"></audio>
+<audio id="waka" preload="auto" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_749b00288e.mp3?filename=pacman-waka-waka-112.wav"></audio>
+<audio id="bonusS" preload="auto" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_5f6a8a8e5f.mp3?filename=powerup-1-6222.mp3"></audio>
 
 <script>
-/* ======================
-   Initialization & UI
-   ====================== */
-
-/* create floating bubbles/stars */
+/* bubbles */
 for(let i=0;i<20;i++){
-  const el = document.createElement('div');
-  el.className = Math.random()>0.55 ? 'bubble' : 'star';
-  el.style.left = (Math.random()*92 + 2) + 'vw';
-  el.style.top  = (Math.random()*92 + 2) + 'vh';
-  el.style.animationDuration = (5 + Math.random()*10) + 's';
-  el.style.opacity = 0.6 + Math.random()*0.4;
+  const el=document.createElement('div');
+  el.className=Math.random()>0.55?'bubble':'star';
+  el.style.left=(Math.random()*92+2)+'vw';
+  el.style.top=(Math.random()*92+2)+'vh';
+  el.style.animationDuration=(5+Math.random()*10)+'s';
   document.body.appendChild(el);
 }
 
-/* elements */
-const comidaBtn = document.getElementById('comida-btn');
-const noFermentar = document.getElementById('no-fermentar');
-const pacmanContainer = document.getElementById('pacman-container');
-const pacman = document.getElementById('pacman');
-const message = document.getElementById('pacman-message');
-const bgm = document.getElementById('bgm');
-const clickS = document.getElementById('clickS');
-const waka = document.getElementById('waka');
-const bonusS = document.getElementById('bonusS');
-const bonus = document.getElementById('bonus');
-const poll = document.getElementById('poll');
-const pollMsg = document.getElementById('poll-msg');
-const joinBtn = document.getElementById('join-btn');
+const comidaBtn=document.getElementById('comida-btn');
+const noFermentar=document.getElementById('no-fermentar');
+const pacmanContainer=document.getElementById('pacman-container');
+const pacman=document.getElementById('pacman');
+const message=document.getElementById('pacman-message');
+const bgm=document.getElementById('bgm');
+const clickS=document.getElementById('clickS');
+const waka=document.getElementById('waka');
+const bonusS=document.getElementById('bonusS');
+const bonus=document.getElementById('bonus');
+const poll=document.getElementById('poll');
+const pollMsg=document.getElementById('poll-msg');
+const joinBtn=document.getElementById('join-btn');
 
-let userStartedAudio = false; // flag: start audio on first touch
-function startAudioIfNeeded(){
-  if(userStartedAudio) return;
-  userStartedAudio = true;
-  // try to play BGM immediately (some mobile browsers require a user gesture)
-  try{ bgm.volume = 0.28; bgm.play().catch(()=>{}); }catch(e){}
+let userStarted=false;
+function startAudio(){
+  if(userStarted)return;
+  userStarted=true;
+  bgm.volume=0.25;bgm.play().catch(()=>{});
 }
+function playSound(a,v=1){try{const s=a.cloneNode(true);s.volume=v;s.play().catch(()=>{});}catch(e){}}
 
-/* play short sounds safely (clone to allow overlapping) */
-function playSound(audioEl, vol=1){
-  try{
-    const s = audioEl.cloneNode(true);
-    s.volume = vol;
-    s.play().catch(()=>{});
-  }catch(e){}
-}
-
-/* hover and touch sound for buttons (desktop hover may not be used on mobile) */
-[...document.querySelectorAll('.button'), ...document.querySelectorAll('.poll-btn')].forEach(btn=>{
-  btn.addEventListener('pointerenter', ()=>{ playSound(clickS, 0.9); });
-  btn.addEventListener('touchstart', ()=>{ startAudioIfNeeded(); playSound(clickS, 0.9); }, {passive:true});
+document.querySelectorAll('.button,.poll-btn').forEach(b=>{
+  b.addEventListener('click',()=>{startAudio();playSound(clickS,0.9);});
 });
 
-/* === comida button -> show pacman area, hide join/disable no-fermentar === */
-comidaBtn.addEventListener('click', (e)=>{
+comidaBtn.addEventListener('click',e=>{
   e.preventDefault();
-  startAudioIfNeeded();
-  playSound(clickS, 0.9);
-  comidaBtn.style.display = 'none';
-  noFermentar.style.display = 'none';
-  pacmanContainer.style.display = 'flex';
+  comidaBtn.style.display='none';noFermentar.style.display='none';
+  pacmanContainer.style.display='flex';
 });
 
-/* === Pac-Man logic: bigger clickable hit area & death behavior === */
-let pacmanAlive = true;
-
-/* Increase clickable hit area by listening on container for taps near pacman.
-   But keep original behaviour: clicking pacman element triggers death. */
-pacman.style.touchAction = 'manipulation';
-pacman.addEventListener('click', pacmanKill);
-pacman.addEventListener('touchstart', function(e){ startAudioIfNeeded(); }, {passive:true});
-
-function pacmanKill(){
-  if(!pacmanAlive) return;
-  pacmanAlive = false;
-  startAudioIfNeeded();
-  playSound(waka, 0.9);   // pacman waka sound
-  playSound(bonusS, 0.9); // little power sound
-  // stop pacman animations visually -> dead state
-  pacman.style.animation = 'none';
-  pacman.style.background = '#ff4040';
-  pacman.style.filter = 'drop-shadow(0 0 28px #ff0033)';
-  pacman.style.clipPath = 'circle(50%)';
-  // show a small "GAME OVER" over the animation area
-  const go = document.createElement('div');
-  go.textContent = "💀 PAC-MAN CAÍDO 💀";
-  go.style.position = 'absolute';
-  go.style.top = '8px';
-  go.style.left = '50%';
-  go.style.transform = 'translateX(-50%)';
-  go.style.color = '#ff4466';
-  go.style.textShadow = '0 0 10px #ff00ff,0 0 18px #ff0000';
-  go.style.fontSize = '12px';
-  go.style.animation = 'blink 1s infinite';
+let pacmanAlive=true;
+pacman.addEventListener('click',()=>{
+  if(!pacmanAlive)return;pacmanAlive=false;startAudio();
+  playSound(waka,0.9);playSound(bonusS,0.9);
+  pacman.style.animation='none';
+  pacman.style.background='#ff4040';pacman.style.filter='drop-shadow(0 0 28px #ff0033)';
+  pacman.style.clipPath='circle(50%)';
+  const go=document.createElement('div');
+  go.textContent='💀 PAC-MAN CAÍDO 💀';
+  go.style.position='absolute';go.style.top='8px';go.style.left='50%';
+  go.style.transform='translateX(-50%)';go.style.color='#ff4466';
+  go.style.textShadow='0 0 10px #ff00ff,0 0 18px #ff0000';go.style.fontSize='12px';
+  go.style.animation='blink 1s infinite';
   document.getElementById('animation').appendChild(go);
-  // message invites to first session (user requested text)
-  bonus.style.animation = 'showBonus 1.2s forwards';
-  message.textContent = "💀 Pac-Man ha caído... pero tú puedes ganar comida gratis en nuestro primer encuentro del club 🍒";
+  bonus.style.animation='showBonus 1.2s forwards';
+  message.textContent='💀 Pac-Man ha caído... pero tú puedes ganar comida gratis en nuestro primer encuentro del club 🍒';
   setTimeout(()=>{
-    bonus.style.animation = 'none';
-    message.textContent = "👉 Dale click a 'QUIERO UNIRME' para inscribirte 🍽️";
-    poll.style.display = 'flex';
+    bonus.style.animation='none';
+    message.textContent="👉 Dale click a 'QUIERO UNIRME' para inscribirte 🍽️";
+    poll.style.display='flex';
   },4000);
-}
-
-/* on first touch anywhere also start audio (for safety on mobile) */
-function onFirstInteraction(){
-  startAudioIfNeeded();
-  playSound(clickS, 0.8);
-  // remove this handler after first touch
-  document.removeEventListener('pointerdown', onFirstInteraction, {passive:true});
-}
-document.addEventListener('pointerdown', onFirstInteraction, {passive:true});
-
-/* no-fermentar button (troll) */
-noFermentar.addEventListener('click', (e)=>{
-  e.preventDefault();
-  startAudioIfNeeded();
-  playSound(clickS, 0.9);
-  // show a small hologram-style modal quickly (non-blocking) instead of plain alert on mobile
-  spawnTransientHolo("🐄 ¡DESHONOR SOBRE TU VACA! Has rechazado la fermentación ancestral 🐄", 3000);
 });
 
-/* === Poll / voting behavior: message + sound + tiny vibra === */
-const pollTexts = {
-  Kimchi: "🔥 Picante como tu espíritu fermentador 🔥",
-  "Masa madre": "🍞 Levadura legendaria, respeto total 🍞",
-  Kombucha: "🍶 Probiótico y poderoso 🍶",
-  "Kéfir": "🥛 Culturas ancestrales aprueban tu elección 🥛"
+noFermentar.addEventListener('click',e=>{
+  e.preventDefault();
+  startAudio();playSound(clickS,0.9);
+  alert("🐄 ¡DESHONOR SOBRE TU VACA! Has rechazado la fermentación ancestral 🐄");
+});
+
+const pollTexts={
+  Kimchi:"🔥 Picante como tu espíritu fermentador 🔥",
+  "Masa madre":"🍞 Levadura legendaria, respeto total 🍞",
+  Kombucha:"🍶 Probiótico y poderoso 🍶",
+  "Kéfir":"🥛 Culturas ancestrales aprueban tu elección 🥛"
 };
-document.querySelectorAll('.poll-btn').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    const name = btn.dataset.name;
-    pollMsg.textContent = pollTexts[name];
-    playSound(bonusS, 0.95);
-    // visual zing
-    btn.style.transform = 'scale(1.25)';
-    btn.style.boxShadow = '0 0 32px var(--neon-b)';
-    setTimeout(()=>{ btn.style.transform='scale(1)'; btn.style.boxShadow=''; }, 520);
+document.querySelectorAll(".poll-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    const name=btn.dataset.name;pollMsg.textContent=pollTexts[name];
+    playSound(bonusS,0.95);
+    btn.style.transform="scale(1.25)";btn.style.boxShadow="0 0 32px var(--neon-b)";
+    setTimeout(()=>{btn.style.transform="scale(1)";btn.style.boxShadow="";},520);
   });
 });
 
-/* ======================
-   Hologram spawn logic
-   - spawn faster on desktop, but respects "empty" zones
-   - avoids: title top area, center column (buttons/pacman), footer bottom band
-   ====================== */
-const holoMessages = [
-  "🍶 FREE KOMBUCHA ALERT!",
-  "🧫 MICROBIOS = MAGIC",
-  "💾 CFU FOREVER 2000",
-  "🪩 FERMENT THE SYSTEM",
-  "📸 Síguenos en Instagram @cfuniandes",
-  "🧬 JOIN THE CULTURA",
-  "✨ VIBRANDO EN pH 3.8 ✨"
+/* holograms: appear only outside central zone */
+const holoMessages=[
+  "🍶 FREE KOMBUCHA ALERT!","🧫 MICROBIOS = MAGIC","💾 CFU FOREVER 2000",
+  "🪩 FERMENT THE SYSTEM","📸 Síguenos en Instagram @cfuniandes","🧬 JOIN THE CULTURA","✨ VIBRANDO EN pH 3.8 ✨"
 ];
-
-/* helper: compute safe spawn zones (in vw/vh units)
-   We'll avoid a central rectangle that contains title/buttons/pacman.
-   We also avoid top very small band and bottom footer. */
 function spawnHolo(){
-  const maxHolos = 4;
-  if(document.querySelectorAll('.holo').length >= maxHolos) return;
-
-  const vw = Math.max(document.documentElement.clientWidth || 320, window.innerWidth || 320);
-  const vh = Math.max(document.documentElement.clientHeight || 640, window.innerHeight || 640);
-
-  // define forbidden central rectangle in vw/vh percentages
-  // centerRect roughly: left 18vw - right 82vw, top 20vh - bottom 72vh (so we keep buttons+pacman safe)
-  const forbidden = { left:18, right:82, top:20, bottom:72 };
-  // also avoid very-top band for title (top < 6vh) and footer bottom band (bottom > 90vh)
-  const avoidTop = 6; const avoidBottom = 88;
-
-  let leftPct, topPct, attempts = 0;
-  do {
-    leftPct = 5 + Math.random()*90;     // allow from 5vw to 95vw but we'll filter
-    topPct  = 4 + Math.random()*86;     // allow from 4vh to 90vh
-    attempts++;
-    if(attempts>60) break;
-  } while(
-    (leftPct>forbidden.left && leftPct<forbidden.right && topPct>forbidden.top && topPct<forbidden.bottom) ||
-    (topPct < avoidTop) || (topPct > avoidBottom)
+  if(document.querySelectorAll('.holo').length>=4)return;
+  let left,top,tries=0;
+  do{
+    left=Math.random()*100;top=Math.random()*100;tries++;
+  }while(
+    (left>20&&left<80&&top>25&&top<75)|| // central zone
+    (top<10)||(top>88)                   // avoid title/footer
   );
-
-  // create holo
-  const d = document.createElement('div');
-  d.className = 'holo';
-  d.textContent = holoMessages[Math.floor(Math.random()*holoMessages.length)];
-  d.style.left = leftPct + 'vw';
-  d.style.top  = topPct  + 'vh';
-
-  // slight random rotation and staggered movement to feel holographic
-  d.style.transformOrigin = 'center';
-  d.style.rotate = (Math.random()*8 - 4) + 'deg';
-
+  const d=document.createElement('div');
+  d.className='holo';
+  d.textContent=holoMessages[Math.floor(Math.random()*holoMessages.length)];
+  d.style.left=left+'vw';d.style.top=top+'vh';
+  d.style.rotate=(Math.random()*8-4)+'deg';
   document.body.appendChild(d);
-  // remove after animation (6s) + small buffer
-  setTimeout(()=>{ if(d && d.parentNode) d.parentNode.removeChild(d); }, 6200);
+  setTimeout(()=>d.remove(),6000);
 }
-
-/* spawn interval: faster than original request but gentle: every 1.8s */
-let holoInterval = setInterval(spawnHolo, 1800);
-
-/* Reduce spawn rate on very small screens if needed (but per your request keep lively) */
-function adjustHoloRate(){
-  if(window.innerWidth <= 420){
-    clearInterval(holoInterval);
-    holoInterval = setInterval(spawnHolo, 2400); // a bit slower on tiny phones
-  } else {
-    clearInterval(holoInterval);
-    holoInterval = setInterval(spawnHolo, 1800);
-  }
-}
-window.addEventListener('resize', adjustHoloRate);
-adjustHoloRate();
-
-/* quick helper to spawn a custom transient holo (used for no-fermentar message) */
-function spawnTransientHolo(text, ms=2500){
-  const d = document.createElement('div');
-  d.className = 'holo';
-  d.textContent = text;
-  // place near center-top but not over title: ~top 14vh, left center
-  d.style.left = '50%'; d.style.transform = 'translateX(-50%)';
-  d.style.top = '14vh';
-  document.body.appendChild(d);
-  setTimeout(()=>{ if(d && d.parentNode) d.parentNode.removeChild(d); }, ms);
-}
-
-/* ensure accessibility: if user presses join, start audio too */
-joinBtn.addEventListener('click', ()=>{ startAudioIfNeeded(); playSound(clickS,0.9); });
-
-/* ensure pacman area easier to tap: we add a transparent hitbox around pacman (only for pointer events) */
-(function addHitbox(){
-  // create invisible larger hitbox anchored to pacman
-  const hit = document.createElement('div');
-  hit.style.position = 'absolute';
-  hit.style.width = '110px';
-  hit.style.height = '110px';
-  hit.style.left = '-23px';
-  hit.style.top = '10px';
-  hit.style.background = 'transparent';
-  hit.style.cursor = 'pointer';
-  hit.style.zIndex = '3';
-  // forward clicks to pacman
-  hit.addEventListener('click', ()=> pacman.click());
-  hit.addEventListener('touchstart', ()=> pacman.click(), {passive:true});
-  document.getElementById('animation').appendChild(hit);
-})();
-
-/* done initialization */
+setInterval(spawnHolo,1800);
 </script>
 </body>
 </html>
