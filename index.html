@@ -57,27 +57,73 @@ h1{font-size:14px;margin:0 0 18px 0;color:var(--accent);text-shadow:0 0 10px var
 .button:hover{transform:scale(1.05);box-shadow:0 0 30px var(--neon-b)}
 
 /* pacman */
-#pacman-container{display:none;flex-direction:column;align-items:center;margin-top:18px;width:100%;max-width:360px}
+#pacman-container{display:none;flex-direction:column;align-items:center;margin-top:18px;width:100%;max-width:360px;
+  cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 16 16'><rect x='6' y='1' width='1' height='1' fill='%23228B22'/><rect x='8' y='1' width='1' height='1' fill='%23228B22'/><rect x='5' y='2' width='1' height='1' fill='%23228B22'/><rect x='6' y='2' width='1' height='2' fill='%2332CD32'/><rect x='7' y='2' width='2' height='1' fill='%23228B22'/><rect x='8' y='2' width='1' height='2' fill='%2332CD32'/><rect x='9' y='2' width='1' height='1' fill='%23228B22'/><rect x='4' y='4' width='1' height='1' fill='%23DC143C'/><rect x='5' y='4' width='2' height='1' fill='%23FF1744'/><rect x='7' y='3' width='1' height='2' fill='%23228B22'/><rect x='8' y='4' width='2' height='1' fill='%23FF1744'/><rect x='10' y='4' width='1' height='1' fill='%23DC143C'/><rect x='3' y='5' width='1' height='2' fill='%23DC143C'/><rect x='4' y='5' width='1' height='3' fill='%23FF1744'/><rect x='5' y='5' width='1' height='4' fill='%23FF1744'/><rect x='6' y='5' width='1' height='5' fill='%23FF1744'/><rect x='7' y='5' width='1' height='5' fill='%23FF1744'/><rect x='8' y='5' width='1' height='5' fill='%23FF1744'/><rect x='9' y='5' width='1' height='4' fill='%23FF1744'/><rect x='10' y='5' width='1' height='3' fill='%23FF1744'/><rect x='11' y='5' width='1' height='2' fill='%23DC143C'/><rect x='5' y='6' width='1' height='1' fill='%23FFFFFF'/><rect x='9' y='6' width='1' height='1' fill='%23FFFFFF'/><rect x='4' y='8' width='1' height='1' fill='%23DC143C'/><rect x='5' y='9' width='1' height='1' fill='%23DC143C'/><rect x='6' y='10' width='2' height='1' fill='%23DC143C'/><rect x='9' y='9' width='1' height='1' fill='%23DC143C'/><rect x='10' y='8' width='1' height='1' fill='%23DC143C'/></svg>") 8 2,auto;
+}
 #animation{
   position:relative;width:320px;height:120px;
-  background:repeating-linear-gradient(to right,#111 0,#111 15px,#0a0a1a 15px,#0a0a1a 30px);
+  background:#000000;
   border:3px solid var(--accent);border-radius:12px;box-shadow:0 0 20px var(--accent);overflow:hidden
 }
-.pacman{position:absolute;top:30px;width:64px;height:64px;background:#ffff00;border-radius:50%;
-clip-path:polygon(50% 50%,100% 0%,100% 100%);
-animation:chomp .36s infinite alternate,movePacman 5s linear infinite;
-filter:drop-shadow(0 0 16px #ffff66);cursor:pointer}
-@keyframes chomp{0%{clip-path:polygon(50% 50%,100% 10%,100% 90%)}100%{clip-path:polygon(50% 50%,100% 0%,100% 100%)}}
-@keyframes movePacman{0%{left:-70px}45%{left:260px}50%{transform:rotateY(180deg)}95%{left:-70px}100%{left:-70px}}
-.cherry{position:absolute;top:42px;left:248px;width:18px;height:18px;background:#ff2b2b;border-radius:50%;
-box-shadow:inset -3px -3px 5px rgba(0,0,0,.25),0 0 12px #ff0044}
+/* Movimiento sin saltos + chompeo */
+/* Pac-Man: cuerpo amarillo; la boca es un pseudo-elemento negro */
+.pacman{
+  position:absolute;top:30px;left:-70px;
+  width:64px;height:64px;border-radius:50%;
+  background:#ffff00;
+  cursor:inherit;
+  transform-origin:center;
+  animation:movePacman 5s linear infinite;
+  overflow:hidden;
+}
+
+/* Boca negra animada */
+.pacman::after{
+  content:"";
+  position:absolute;inset:0;
+  background:#000000;
+  clip-path:polygon(50% 50%,100% 18%,100% 82%);
+  animation:chomp-mouth .36s infinite alternate;
+}
+
+/* al "morir" escondemos la boca */
+.pacman.dead::after{
+  display:none;
+}
+
+@keyframes chomp-mouth{
+  0%  { clip-path:polygon(50% 50%,100% 18%,100% 82%); }  /* medio cerrada */
+  100%{ clip-path:polygon(50% 50%,100% 0%,100% 100%); }  /* boca abierta */
+}
+
+@keyframes movePacman{
+  0%   {left:-70px; transform:rotateY(0deg)}
+  45%  {left:260px; transform:rotateY(0deg)}   /* va a la derecha */
+  50%  {left:260px; transform:rotateY(180deg)} /* gira */
+  95%  {left:-70px; transform:rotateY(180deg)} /* regresa mirando izq */
+  100% {left:-70px; transform:rotateY(180deg)}
+}
+/*.cherry{
+  position:absolute;top:42px;left:248px;width:18px;height:18px;background:#ff2b2b;border-radius:50%;
+  box-shadow:inset -3px -3px 5px rgba(0,0,0,.25),0 0 12px #ff0044
+}*/
 #bonus{position:absolute;top:8px;left:140px;color:#ffcc00;font-size:10px;opacity:0}
+
+/* 🔧 BONUS: animación faltante (bug fix) */
+@keyframes showBonus{
+  0%{opacity:0;transform:translateY(6px) scale(.9);text-shadow:0 0 0 #ffcc00}
+  30%{opacity:1;transform:translateY(0) scale(1);text-shadow:0 0 10px #ffcc00}
+  70%{opacity:1}
+  100%{opacity:0;transform:translateY(-10px) scale(1.05)}
+}
+
 #pacman-message{color:#ffcc00;text-shadow:0 0 12px var(--neon-b);font-size:16px;margin-top:14px;max-width:90%;line-height:1.3}
 
 /* poll */
 #poll{display:none;margin-top:16px;flex-direction:column;align-items:center}
 .poll-btn{margin:6px;background:linear-gradient(45deg,var(--neon-b),var(--accent));
-color:#000;padding:12px 20px;border-radius:10px;box-shadow:0 0 16px var(--accent);font-size:12px}
+color:#000;padding:12px 20px;border-radius:10px;box-shadow:0 0 16px var(--accent);font-size:12px;
+font-family:'Press Start 2P',monospace;border:none;cursor:pointer;transition:transform .2s,box-shadow .2s}
 .poll-msg{margin-top:12px;color:#ffcc00;font-size:12px;text-shadow:0 0 8px var(--neon-b)}
 
 /* holo */
@@ -122,8 +168,8 @@ footer span{display:inline-block;white-space:nowrap;animation:marq 20s linear in
 
 <div id="pacman-container">
   <div id="animation">
-    <div class="pacman" id="pacman"></div>
-    <div class="cherry"></div>
+    <div class="pacman" id="pacman" aria-label="Pac-Man"></div>
+    <div class="cherry" aria-hidden="true"></div>
     <div id="bonus">+100 pts 🍒</div>
   </div>
   <div id="pacman-message">🎮 DALE CLICK AL PAC-MAN PARA OBTENER COMIDA GRATIS 🍒</div>
@@ -178,7 +224,9 @@ function startAudio(){
   userStarted=true;
   bgm.volume=0.25;bgm.play().catch(()=>{});
 }
-function playSound(a,v=1){try{const s=a.cloneNode(true);s.volume=v;s.play().catch(()=>{});}catch(e){}}
+function playSound(a,v=1){
+  try{const s=a.cloneNode(true);s.volume=v;s.play().catch(()=>{});}catch(e){}
+}
 
 document.querySelectorAll('.button,.poll-btn').forEach(b=>{
   b.addEventListener('click',()=>{startAudio();playSound(clickS,0.9);});
@@ -186,32 +234,46 @@ document.querySelectorAll('.button,.poll-btn').forEach(b=>{
 
 comidaBtn.addEventListener('click',e=>{
   e.preventDefault();
-  comidaBtn.style.display='none';noFermentar.style.display='none';
+  comidaBtn.style.display='none';
+  noFermentar.style.display='none';
   pacmanContainer.style.display='flex';
 });
 
-let pacmanAlive=true;
-pacman.addEventListener('click',()=>{
-  if(!pacmanAlive)return;pacmanAlive=false;startAudio();
-  playSound(waka,0.9);playSound(bonusS,0.9);
-  pacman.style.animation='none';
-  pacman.style.background='#ff4040';pacman.style.filter='drop-shadow(0 0 28px #ff0033)';
-  pacman.style.clipPath='circle(50%)';
-  const go=document.createElement('div');
-  go.textContent='💀 PAC-MAN CAÍDO 💀';
-  go.style.position='absolute';go.style.top='8px';go.style.left='50%';
-  go.style.transform='translateX(-50%)';go.style.color='#ff4466';
-  go.style.textShadow='0 0 10px #ff00ff,0 0 18px #ff0000';go.style.fontSize='12px';
-  go.style.animation='blink 1s infinite';
+let pacmanAlive = true;
+pacman.addEventListener('click', () => {
+  if (!pacmanAlive) return;
+  pacmanAlive = false;
+  startAudio();
+  playSound(waka, 0.9);
+  playSound(bonusS, 0.9);
+
+  // Eliminamos Pac-Man
+  pacman.style.display = 'none';
+
+  const go = document.createElement('div');
+  go.textContent = '🍽️ PACMAN ALIMENTADO 🍽️';
+  go.style.position = 'absolute';
+  go.style.top = '50%';
+  go.style.left = '50%';
+  go.style.transform = 'translate(-50%, -50%)';
+  go.style.color = '#FFD700';
+  go.style.textShadow = '0 0 10px #FFAA00,0 0 18px #FF6600';
+  go.style.fontSize = '18px';
+  go.style.animation = 'blink 1s infinite';
+  go.style.width = '90%';
+  go.style.textAlign = 'center';
   document.getElementById('animation').appendChild(go);
-  bonus.style.animation='showBonus 1.2s forwards';
-  message.textContent='💀 Pac-Man ha caído... pero tú puedes ganar comida gratis en nuestro primer encuentro del club 🍒';
-  setTimeout(()=>{
-    bonus.style.animation='none';
-    message.textContent="👉 Dale click a 'QUIERO UNIRME' para inscribirte 🍽️";
-    poll.style.display='flex';
-  },4000);
+
+  bonus.style.animation = 'showBonus 1.2s forwards';
+
+  message.textContent = 'Asiste a nuestro primer encuentro y disfruta de COMIDA GRATIS 🍕';
+  setTimeout(() => {
+    bonus.style.animation = 'none';
+    message.textContent = "👉 Dale click a 'QUIERO UNIRME' para inscribirte 🍽️";
+    poll.style.display = 'flex';
+  }, 4000);
 });
+
 
 noFermentar.addEventListener('click',e=>{
   e.preventDefault();
@@ -225,12 +287,18 @@ const pollTexts={
   Kombucha:"🍶 Probiótico y poderoso 🍶",
   "Kéfir":"🥛 Culturas ancestrales aprueban tu elección 🥛"
 };
+let pollVoted=false;
 document.querySelectorAll(".poll-btn").forEach(btn=>{
   btn.addEventListener("click",()=>{
+    if(pollVoted)return;
+    pollVoted=true;
     const name=btn.dataset.name;pollMsg.textContent=pollTexts[name];
     playSound(bonusS,0.95);
     btn.style.transform="scale(1.25)";btn.style.boxShadow="0 0 32px var(--neon-b)";
-    setTimeout(()=>{btn.style.transform="scale(1)";btn.style.boxShadow="";},520);
+    document.querySelectorAll(".poll-btn").forEach(b=>{
+      if(b!==btn){b.style.opacity="0.3";b.style.pointerEvents="none";}
+    });
+    setTimeout(()=>{btn.style.transform="scale(1)";},520);
   });
 });
 
